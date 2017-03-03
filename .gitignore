@@ -7,4 +7,5 @@ nyucalctikz.out
 nyucalctikz.toc
 pgfcodex.sty
 tikzdtx.sty
-tikzlibrarynyucalc.code.tex
+nyucalctikz.ilg
+nyucalctikz.ind

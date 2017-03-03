@@ -1,0 +1,157 @@
+%%
+%% This is file `tikzlibrarynyucalc.code.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% nyucalctikz.dtx  (with options: `library')
+%% -----------------------------------------------------------------------------
+%% tikzlibrarynyucalc.code.tex -- a TikZ/PGF library for NYU calculus materials
+%% E-mail: leingang@nyu.edu
+%% All rights reserved.
+%% -----------------------------------------------------------------------------
+%% 
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesFile{tikzlibrarynyucalc.code.tex}[2017/03/02 v0.0-dev TikZ and PGFPlots code for NYU calculus materials]
+\usepackage{tikz}
+\input{svgnam.def}
+\usetikzlibrary{%
+    positioning,
+    shapes,
+}
+%%
+\tikzstyle{point}=[
+    fill,fill opacity=1,
+    circle,
+    minimum size=3pt,inner sep=0pt,outer sep=0pt]
+\tikzstyle{open point}=[draw,fill=white,circle,minimum size=3pt,inner sep=0pt,outer sep=0pt]
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{foreground}
+\pgfsetlayers{background,main,foreground}
+
+\tikzstyle{measurement}=[arrows={|<->|},Black]
+\tikzstyle{angle measurement}=[measurement,arrows={->}]
+\tikzstyle{behind}=[black!20]
+\tikzstyle{imaginary}=[dashed]
+\tikzstyle{set}=[draw=primary,thick,ellipse,shade,top color=primary!50,bottom color=white,inner sep=4mm]
+\tikzstyle{chain}=[%
+    decoration={%
+        shape backgrounds,
+        shape=ellipse,
+        shape width=5pt,
+        shape height=2.5pt,
+        shape sep=4pt},
+    decorate
+]
+\definecolor{primary}  {HTML}{3CFFEE}
+\definecolor{secondary}{HTML}{24AABC}
+\definecolor{tertiary}{HTML}{356781}
+\definecolor{quartenary}{HTML}{2C3D51}
+\definecolor{quintenary}{HTML}{1C1F24}
+\tikzstyle{curve}=[primary,thick]
+\tikzstyle{curve label}=[black,opacity=1]
+\tikzstyle{curve direction}=[curve,fill opacity=1]
+\tikzstyle{region}=[curve,fill=quartenary]
+\tikzstyle{surface}=[fill=quartenary,opacity=0.5]
+\tikzstyle{function}=[curve]
+\RequirePackage{pgfplots}
+\pgfplotsset{compat=1.10}
+\usepgfplotslibrary{groupplots}
+\usepgfplotslibrary{fillbetween}
+\pgfplotsset{
+    every linear axis/.append style={%
+        axis x line=middle, axis y line=middle,%
+        cycle multi list={%
+            solid,dashed,dotted\nextlist
+            {function,primary},
+            {function,secondary},
+            {function,tertiary},
+            {function,quartenary}
+        },
+    },
+    every axis plot/.append style={every label/.append style={black}}
+}
+\tikzstyle{every mark}=[mark=*,mark size=1pt]
+\pgfplotsset{
+    number line/.style={%
+        axis x line=bottom,
+        ymin=0,ymax=0.1,
+        axis equal image,
+        hide y axis,
+        every axis x label/.append style={%
+            anchor=west,
+            align=left,
+        },
+        execute at end axis={
+            \addplot[draw=none,forget plot] {0};
+        }
+    }
+}
+\pgfplotsset{%
+    number line y/.style={%
+        axis y line=left,
+        axis equal image,
+        xmin=0,xmax=0.1,
+        hide x axis,
+        every axis y label/.append style={
+            anchor=south east,
+            align=left
+        },
+    }
+}
+\pgfplotsset{%
+    interval labels/.style={
+        after end axis/.prefix code={
+            \foreach \x/\val/\desc in {#1} {
+                \ifx\val\desc
+                    \edef\temp{\noexpand\draw ({axis cs:\x,0}|-{xticklabel* cs:0})
+                        node[number line value] {\unexpanded\expandafter{\val}};}%
+                \else
+                    \edef\temp{\noexpand\draw ({axis cs:\x,0}|-{xticklabel* cs:0})
+                    node[number line value] {\unexpanded\expandafter{\val}}
+                    node[number line description] {\unexpanded\expandafter{\desc}};}
+                \fi
+                \temp
+            }
+        }
+    },
+    point labels/.style={
+        after end axis/.prefix code={
+            \foreach \x/\val/\desc in {#1} {
+                \ifx\val\desc
+                    \edef\temp{\noexpand\draw ({axis cs:\x,0} |- {xticklabel* cs:0})
+                        node[number line value] {\unexpanded\expandafter{\val}};}%
+                \else
+                    \edef\temp{%
+                        \noexpand\draw ({axis cs:\x,0} |- {xticklabel* cs:0})
+                            node[number line value] {\unexpanded\expandafter{\val}};
+                        \noexpand\draw ({axis cs:\x,0} |- {xticklabel cs:0})
+                        node[number line description] {\unexpanded\expandafter{\desc\strut}};
+                        }%
+                \fi
+                \temp
+            }
+        }
+    }
+}
+\usepgfplotslibrary{polar}
+\pgfplotsset{
+slope field/.style={
+    secondary,thin,
+    /pgfplots/quiver={u=1,v={#1},scale arrows=0.1},
+    /pgfplots/x filter/.expression={x-1*0.5*\pgfkeysvalueof{/pgfplots/quiver/scale arrows}},
+    /pgfplots/y filter/.expression={y-(#1)*.5*\pgfkeysvalueof{/pgfplots/quiver/scale arrows}}
+    },
+    ode solution/.style={primary},
+}
+\tikzset{>=stealth}
+\tikzstyle{vector}=[primary,very thick,arrows={->}]
+\tikzstyle{vector label}=[pos=0.5,black]
+%% 
+%% Copyright (C) 2012-7 by Matthew Leingang <leingang@nyu.edu>
+%% and the NYU Math Clinic.
+%% 
+%% This work consists of the file  nyucalctikz.dtx
+%% and the derived files           tikzlibrarynyucalc.code.tex
+%%
+%% End of file `tikzlibrarynyucalc.code.tex'.

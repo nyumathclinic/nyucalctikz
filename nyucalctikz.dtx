@@ -1,0 +1,539 @@
+% \iffalse meta-comment
+% http://www.texdev.net/2009/10/06/a-model-dtx-file/
+% !TEX program  = pdfLaTeX
+%<*internal>
+\iffalse
+%</internal>
+%<*internal>
+\fi
+\def\nameofplainTeX{plain}
+\ifx\fmtname\nameofplainTeX\else
+  \expandafter\begingroup
+\fi
+%</internal>
+%<*install>
+\input docstrip.tex
+\keepsilent
+\askforoverwritefalse
+\preamble
+-----------------------------------------------------------------------------
+tikzlibrarynyucalc.code.tex -- a TikZ/PGF library for NYU calculus materials
+E-mail: leingang@nyu.edu
+All rights reserved.
+-----------------------------------------------------------------------------
+
+\endpreamble
+\postamble
+
+Copyright (C) 2012-7 by Matthew Leingang <leingang@nyu.edu> 
+and the NYU Math Clinic.
+
+This work consists of the file  nyucalctikz.dtx
+and the derived files           tikzlibrarynyucalc.code.tex
+\endpostamble
+%<install> \UseTDS
+%<install> \usedir{tex/generic}
+%<*!install>
+\ifx\fmtname\nameofplainTeX
+%</!install>
+\generate{\file{tikzlibrarynyucalc.code.tex}{\from{\jobname.dtx}{library}}}
+%<*!install>
+\generate{\file{\jobname.ins}{\from{\jobname.dtx}{install}}}
+\fi
+%</!install>
+%</install>
+%<install>\end
+%<*internal>
+\ifx\fmtname\nameofplainTeX
+  \expandafter\endbatchfile\else
+  \expandafter\endgroup\fi 
+%</internal>
+%<*library>
+% Keep version numbering separate from nyucalc.tex version numbering
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesFile{tikzlibrarynyucalc.code.tex}[2017/03/02 v0.0-dev TikZ and PGFPlots code for NYU calculus materials]
+%</library>
+%<*driver>
+\documentclass{amsdtx}
+\usepackage{tikzdtx}
+\usepackage[letterpaper]{geometry}
+\usepackage[numbered]{hypdoc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{tikz}
+\usetikzlibrary{nyucalc}
+\usetikzlibrary{fit}
+\usepackage{pgfcodex}
+\def\tikz/{\pkg{\protect{\normalfont Ti\textit{k}Z}}}
+\def\pgf/{\pkg{\protect{\normalfont\textsc{pgf}}}}
+\def\pgfplots/{\pkg{\protect{\normalfont\textsc{pgfplots}}}}
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\begin{document}
+  \DocInput{\jobname.dtx}
+\end{document}
+%</driver>
+% \fi
+%
+% \GetFileInfo{tikzlibrarynyucalc.code.tex}
+%
+% \changes{v0.0}{2017/03/02}{Copied from nyucalctikz}
+%
+% \title{A TikZ library for NYU calculus materials}
+% \author{Matthew Leingang\thanks{Email: leingang@nyu.edu}}
+% \date{Released \filedate\thanks{Version: \fileversion}}
+%
+% \maketitle
+% 
+% \tableofcontents
+%
+% \StopEventually{^^A
+%   \PrintChanges
+%   \PrintIndex
+% }
+%
+% \setcounter{section}{-1}
+% \section{Introduction}
+%
+% This library grew out of a file used for \pkg{beamer} presentations for a 
+% Calculus I class.  Eventually keys and styles were added for Calculus II and III.
+% The file became the basis of a proprietary \tikz/ library for \emph{Calculus 
+% for the Digital Student}.
+% 
+% After several years the need arose to share with the rest of the NYU Mathematics
+% Clinical Faculty.  The \pkg{beamer} parts were excised out and the \tikz/ parts
+% remain.
+%
+% This documentation file includes the implementation code and several examples
+% to aid in making nice diagrams and graphs.
+%
+%
+% We use \tikz/ and \pgfplots/, both built on the \pgf/ package.
+% This code goes into the file \fn{tikzlibrarynyucalc.code.tex}.
+% \setcounter{CodelineNo}{0}
+%    \begin{macrocode}
+%<*library>
+%    \end{macrocode}
+%
+% \section{TikZ}
+%
+%    \begin{macrocode}
+\usepackage{tikz}
+%    \end{macrocode}
+% 
+% We want the colors defined with the \opt{svgnames} options of the \pkg{xcolor} package.
+% Since \tikz/ already loads \pkg{xcolor}, we have to go one step down and input the color definition file.
+%    \begin{macrocode}
+\input{svgnam.def}
+%    \end{macrocode}
+%
+% The following \tikz/ libraries are required:
+% \begin{description}
+%    \item[\pkg{positioning}]     for positioning nodes relative to each other
+%    \item[\pkg{shapes}]          for special node shapes
+% \end{description}
+%
+% The following \tikz/ libraries are required to typeset the manual, but not
+% to use the library.
+% \begin{description}
+%    \item[\pkg{fit}]             for fitting nodes around nodes
+% \end{description}
+%
+%
+% Several others are useful, but not required by this library.
+% As the manual grows, these may migrate into the section above.
+% \begin{description}
+%     \item[\pkg{hobby}]           for drawing nice curves through points
+%     \item[\pkg{patterns}]        for filling with patterns (Macintosh '86 style)
+%     \item[\pkg{decorations.text}] for decorating paths with text
+%     \item[\pkg{decorations.shapes}] for decorating paths with shapes
+%     \item[\pkg{spy}]             for creating spy-on/spy-in nodes
+%     \item[\pkg{intersections}]   for finding intersections of paths
+%     \item[\pkg{arrows}]          for various arrow shapes 
+%     \item[\pkg{calc}]            for calculations on dimensions
+%     \item[\pkg{matrix}]          for creating matrices of TikZ nodes 
+% \end{description}
+%    \begin{macrocode}
+\usetikzlibrary{%
+    positioning,
+%    fit,
+    shapes,
+}
+%    \end{macrocode}
+%
+%%
+% \subsection{Graphs} 
+%
+% These two node styles are used still.
+% They could be someday replaced with \pgfplots/ decorations (\S4.16.3 of the manual)
+% or \cn{addplot} with markers and coordinates?
+% \verb|mark=*| and \verb|mark=o| ought be useful here.
+% 
+%    \begin{macrocode}
+\tikzstyle{point}=[
+    fill,fill opacity=1,
+    circle,
+    minimum size=3pt,inner sep=0pt,outer sep=0pt]
+\tikzstyle{open point}=[draw,fill=white,circle,minimum size=3pt,inner sep=0pt,outer sep=0pt]
+%    \end{macrocode}
+%
+% \subsection{Layers} 
+% With \pgf/ layers we can draw later objects under earlier objects.
+%    \begin{macrocode}
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{foreground}
+\pgfsetlayers{background,main,foreground}
+%    \end{macrocode}
+% 
+%
+% \subsection{Miscellaneous styles}
+% April 14, 2012: Nancy said the \tk{measurement} style is easier to see when it's black.
+% \begin{center}
+%   \begin{tikzpicture}    
+%     \tikzstyle{board}=[draw=BurlyWood!50!black,fill=BurlyWood]
+%     % left stud
+%     \draw[board] (0,-1) rectangle (0.3,2);
+%     \draw[xshift=-0.1cm,measurement] (0,-1) -- (0,2) node[midway,left] {$a$};
+%     % right stud
+%     \draw[board,xshift=2cm] (0,-1) rectangle (0.3,2.2);
+%     \draw[xshift=2.4cm,measurement] (0,-1) -- (0,2.2) node[midway,right] {$x$};
+%     % header
+%     \draw[board,rotate around={5:(0,2)}] (0,2) rectangle (2.3,2.3);
+%     \node[above,sloped,rotate around={5:(0,2)}] at (1,2.3) {header};
+%     \draw[measurement,arrows={-}] ([rotate around={5:(0,2)}]2.3,2) -- (0,2) -- (2.3,2)
+%       node[coordinate,
+%         pin={[inner sep=0pt,pin edge={measurement,arrows=<-}]-135:$\theta$}
+%       ] at ([rotate around={2.5:(0,2)}]1.75,2) {};
+%   \end{tikzpicture}    
+% \end{center}
+
+%    \begin{macrocode}
+\tikzstyle{measurement}=[arrows={|<->|},Black]
+\tikzstyle{angle measurement}=[measurement,arrows={->}]
+\tikzstyle{behind}=[black!20]
+\tikzstyle{imaginary}=[dashed]
+\tikzstyle{set}=[draw=primary,thick,ellipse,shade,top color=primary!50,bottom color=white,inner sep=4mm]
+\tikzstyle{chain}=[%
+    decoration={%
+        shape backgrounds,
+        shape=ellipse,
+        shape width=5pt,
+        shape height=2.5pt,
+        shape sep=4pt},
+    decorate
+]
+%    \end{macrocode}
+%
+%\begin{center}
+%    \pgfsetlayers{background,main,foreground}
+%    \begin{tikzpicture}%[baseline=(current bounding box.center)]
+%        \node[point,label=180:$1$] (P1) {};
+%        \node[point,label=180:$2$] (P2) [below=of P1] {};
+%        \node[point,label=180:$3$] (P3) [below=of P2] {}; 
+%        \draw (P1) 
+%        ++ (3,0)  node[point,label=0:$4$] (P4) {}; 
+%        \node[point,label=0:$5$] (P5) [below=of P4] {}; 
+%        \node[point,label=0:$6$] (P6) [below=of P5] {};
+%        \draw (P1) edge[->,bend left=20] (P4);
+%        \draw (P2) edge[->,bend left=20] (P5);
+%        \draw (P3) edge[->,bend left=20] (P6);
+%        \begin{pgfonlayer}{background}
+%            \node[set,fit=(P1) (P2) (P3)] {};
+%            \node[set,fit=(P4) (P5) (P6)] {};
+%        \end{pgfonlayer}
+%    \end{tikzpicture}
+%\end{center}
+%
+% \section{Color Schemes}
+%
+% \cn{definecolor} and \cn{colorlet} are provided by the \pkg{xcolor} package.
+%
+% This color scheme is ``\href{http://kuler.adobe.com/#themeID/123}{Raygun Gothic}'', which I made on Adobe's Kuler application.
+%    \begin{macrocode}
+\definecolor{primary}  {HTML}{3CFFEE}
+\definecolor{secondary}{HTML}{24AABC}
+\definecolor{tertiary}{HTML}{356781}
+\definecolor{quartenary}{HTML}{2C3D51}
+\definecolor{quintenary}{HTML}{1C1F24}
+%    \end{macrocode}
+%
+% Here is a blue/green motif:
+%    \begin{macrocode}
+%:TODO make this a key
+%\colorlet{primary}{blue!40!black}       % HTML {000066}
+%\colorlet{secondary}{blue!20!white}     % HTML {CCCCFF}
+%\colorlet{tertiary}{Green!40!Black}     % HTML {006600}
+%\colorlet{quartenary}{Green!20!white}   % HTML {CCFFCC}
+%\definecolor{quintenary}{HTML}{1C1F24}
+\tikzstyle{curve}=[primary,thick]
+\tikzstyle{curve label}=[black,opacity=1]
+\tikzstyle{curve direction}=[curve,fill opacity=1]
+\tikzstyle{region}=[curve,fill=quartenary]
+\tikzstyle{surface}=[fill=quartenary,opacity=0.5]
+\tikzstyle{function}=[curve]
+%    \end{macrocode}
+% \begin{center}
+%   \begin{tikzpicture}
+%      \tikzstyle{every node}=[minimum width=2cm,minimum height=1cm]
+%      \node[fill=primary,label=above:primary] (primary) {};
+%      \node[fill=secondary,right=0pt of primary,label=above:secondary] (secondary) {};
+%      \node[fill=tertiary,right=0pt of secondary,label=above:tertiary] (tertiary) {};
+%      \node[fill=quartenary,right=0pt of tertiary,label=above:quartenary] (quartenary) {};
+%   \end{tikzpicture}
+% \end{center}
+%
+% 
+%
+% \section{PGFPLOTS}
+%
+% \pgfplots/ is a massive \pgf//\tikz/ application that does graphs.  Very cool.
+%    \begin{macrocode}
+\RequirePackage{pgfplots}
+\pgfplotsset{compat=1.10}
+\usepgfplotslibrary{groupplots}
+\usepgfplotslibrary{fillbetween}
+%    \end{macrocode}
+%
+% We set every plot to draw axes through the origin 
+% (The default is a box around the plot with ticks on the edges.)
+% Also the ``cycle list'' of colors and line styles.
+%    \begin{macrocode}
+\pgfplotsset{
+    every linear axis/.append style={%
+        axis x line=middle, axis y line=middle,%
+        cycle multi list={%
+            solid,dashed,dotted\nextlist
+            {function,primary},
+            {function,secondary},
+            {function,tertiary},
+            {function,quartenary}
+        },
+    },
+    every axis plot/.append style={every label/.append style={black}}
+}
+%    \end{macrocode}
+%
+% This is for marking points on plots.  It's a \tikz/ key used by \pgfplots/.
+%    \begin{macrocode}
+\tikzstyle{every mark}=[mark=*,mark size=1pt]
+%    \end{macrocode}
+%
+%
+% \subsection{Number lines}
+%
+% We can use pgfplots to make number lines, too.
+% The \tk{number line} key does that.
+% Thanks to TEX.SE user egreg for helping me out here. \url{http://tex.stackexchange.com/q/184191/1402}
+%    \begin{macrocode}
+\pgfplotsset{
+    number line/.style={%
+        axis x line=bottom,
+        ymin=0,ymax=0.1,
+        axis equal image,
+        hide y axis,
+        every axis x label/.append style={%
+            anchor=west,
+            align=left,
+        },
+        execute at end axis={
+            \addplot[draw=none,forget plot] {0};
+        }
+    }
+}
+%    \end{macrocode}
+% \begin{codeexample}[leave comments]
+% \begin{tikzpicture}
+%    \begin{axis}[
+%       number line,
+%       xmin=0,xmax=3,
+%   ]
+%    \end{axis}
+% \end{tikzpicture}
+% \end{codeexample}
+% \changes{v0.3.1}{2015/07/16}{Added a \tk{y number line} key}
+%    \begin{macrocode}
+\pgfplotsset{%
+    number line y/.style={%
+        axis y line=left,
+        axis equal image,
+        xmin=0,xmax=0.1,
+        hide x axis,
+        every axis y label/.append style={
+            anchor=south east,
+            align=left
+        },
+%        execute at end axis={
+%            \addplot[draw=none,forget plot] {0};
+%        }
+    }
+}
+%    \end{macrocode}
+% \begin{codeexample}[leave comments]
+% \begin{tikzpicture}
+%    \begin{axis}[
+%       number line y,
+%       ymin=0,ymax=3,
+%   ]
+%    \end{axis}
+% \end{tikzpicture}
+% \end{codeexample}
+% Use \tk{y number line} with \verb|scale=-1| if you want the number line to increase downwards.
+% \begin{codeexample}[leave comments]
+% \begin{tikzpicture}
+%    \begin{axis}[
+%       number line y,
+%       ymin=0,ymax=3,
+%       yscale=-1
+%   ]
+%    \end{axis}
+% \end{tikzpicture}
+% \end{codeexample}%
+% \tk{interval labels} are for increasing/decreasing, concave up/down, etc.
+%    \begin{macrocode}
+\pgfplotsset{%
+    interval labels/.style={
+        after end axis/.prefix code={
+            \foreach \x/\val/\desc in {#1} {
+                \ifx\val\desc
+                    \edef\temp{\noexpand\draw ({axis cs:\x,0}|-{xticklabel* cs:0}) 
+                        node[number line value] {\unexpanded\expandafter{\val}};}%
+                \else
+                    \edef\temp{\noexpand\draw ({axis cs:\x,0}|-{xticklabel* cs:0}) 
+                    node[number line value] {\unexpanded\expandafter{\val}}
+                    node[number line description] {\unexpanded\expandafter{\desc}};}
+                \fi
+                \temp
+            }
+        }
+    },
+%    \end{macrocode}
+% Point labels are for max/min, inflection point, etc.
+%    \begin{macrocode}
+    point labels/.style={
+        after end axis/.prefix code={
+            \foreach \x/\val/\desc in {#1} {
+                \ifx\val\desc
+                    \edef\temp{\noexpand\draw ({axis cs:\x,0} |- {xticklabel* cs:0}) 
+                        node[number line value] {\unexpanded\expandafter{\val}};}%
+                \else
+                    \edef\temp{%
+                        \noexpand\draw ({axis cs:\x,0} |- {xticklabel* cs:0}) 
+                            node[number line value] {\unexpanded\expandafter{\val}};
+                        \noexpand\draw ({axis cs:\x,0} |- {xticklabel cs:0})
+                        node[number line description] {\unexpanded\expandafter{\desc\strut}};
+                        }%
+                \fi
+                \temp
+            }
+        }
+    }
+}
+%    \end{macrocode}
+%
+%
+% \subsection{Polar plots}
+%
+% \begin{codeexample}[leave comments]
+%    \begin{tikzpicture}
+%    \tikzstyle{every plot}=[] % usually smooth, but that gets in the way of only marks below
+%        \begin{polaraxis}[
+%            axis x line=right,
+%            xtick={0,30,45,60,90,120,135,150,180,210,225,240,270,300,315,330},
+%            xticklabels={
+%                0,$\frac{\pi}{6}$,$\frac{\pi}{4}$,$\frac{\pi}{3}$,$\frac{\pi}{2}$,$\frac{2\pi}{3}$,$\frac{3\pi}{4}$,$\frac{5\pi}{6}$,
+%                $\pi$,$\frac{7\pi}{6}$,$\frac{5\pi}{4}$,$\frac{4\pi}{3}$,$\frac{3\pi}{2}$,$\frac{5\pi}{3}$,$\frac{7\pi}{4}$,$\frac{11\pi}{6}$
+%            },
+%            ymin=0,ymax=2,
+%        ]
+%            \addplot+[mark=none,data cs=polarrad,domain=0:6.28,forget plot,samples=100] {2*sin(deg(x))};
+%            \addplot+[only marks,data cs=polarrad,mark=*] coordinates{
+%                (0.5236,1.)
+%                (0.7854,1.4142)
+%                (1.0472,1.7321)
+%                (1.5708,2.)
+%                (2.0944,1.7321)
+%                (2.3562,1.4142)
+%                (2.618,1.)
+%                (3.1416,0.)
+%            };
+%        \end{polaraxis}
+%    \end{tikzpicture}
+% \end{codeexample}
+%    \begin{macrocode}
+\usepgfplotslibrary{polar}
+%    \end{macrocode}
+%
+% \subsection{Slope fields}
+% 
+% Slope fields are implemented as \pgfplots/ ``quivers''---that is, vector fields.
+% But since no arrow style is set the arrows are headless.
+% We use a coordinate filter to shift the line segments so that the base point 
+% is at the \emph{center} of the segment instead of the tail.
+% \begin{codeexample}[leave comments]
+%    \begin{tikzpicture}[
+%        declare function={
+%            F(\y,\t) = \t+\y;
+%            phi(\t,\yo) = (\yo+1)*exp(\t) - \t - 1;
+%        }
+%    ]
+%        \begin{axis}[
+%            xmin=-3,xmax=3,
+%            ymin=-3,ymax=3,
+%            axis equal image,
+%            view={0}{90},
+%            xtick={-3,-2,...,3},
+%            ytick={-3,-2,...,3},
+%        ]
+%            \addplot3+[
+%                slope field={F(x,y)},
+%                domain=-3:3,
+%                domain y=-3:3,
+%            ]{x};
+%            \addplot+[ode solution,variable=\t,domain=-3:3] {phi(t,1)};
+%            \addplot+[ode solution,variable=\t,domain=-3:3] {phi(t,0)};
+%        \end{axis}
+%    \end{tikzpicture}
+% \end{codeexample}
+%
+%    \begin{macrocode}
+\pgfplotsset{
+slope field/.style={
+    secondary,thin,
+    /pgfplots/quiver={u=1,v={#1},scale arrows=0.1},
+    /pgfplots/x filter/.expression={x-1*0.5*\pgfkeysvalueof{/pgfplots/quiver/scale arrows}},
+    /pgfplots/y filter/.expression={y-(#1)*.5*\pgfkeysvalueof{/pgfplots/quiver/scale arrows}}
+    },
+    ode solution/.style={primary},
+}
+%    \end{macrocode}
+%
+% \section{Vectors}
+%
+% \begin{TikZkey}{vector}
+%     The \tk{vector} key is for vectors.
+% \changes{v0.4}{2015/08/27}{added a \tk{vector} key}
+% \begin{codeexample}[leave comments]
+%    \begin{tikzpicture}
+%        \draw[vector] (0,0) --++ (3,2) node[vector label,below] {$\mathbf{u}$};
+%    \end{tikzpicture}
+% \end{codeexample}
+%    \begin{macrocode}
+\tikzset{>=stealth}
+\tikzstyle{vector}=[primary,very thick,arrows={->}]
+%    \end{macrocode}
+% \end{TikZkey}
+% \begin{TikZkey}{vector label}
+% \changes{v0.5}{2015/09/18}{Added}
+%    \begin{macrocode}
+\tikzstyle{vector label}=[pos=0.5,black]
+%    \end{macrocode}
+% \end{TikZkey}
+%
+%
+%
+% This is the end of \fn{tikzlibrarynyucalc.code.tex}.
+%    \begin{macrocode}
+%</library>
+%    \end{macrocode}
+%\Finale

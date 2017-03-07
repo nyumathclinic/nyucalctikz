@@ -12,7 +12,7 @@
 %% -----------------------------------------------------------------------------
 %% 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesFile{tikzlibrarynyucalc.code.tex}[2017/03/02 v0.0-dev TikZ and PGFPlots code for NYU calculus materials]
+\ProvidesFile{tikzlibrarynyucalc.code.tex}[2017/03/03 v0.0 TikZ and PGFPlots code for NYU calculus materials]
 \usepackage{tikz}
 \input{svgnam.def}
 \usetikzlibrary{%
@@ -43,10 +43,10 @@
         shape sep=4pt},
     decorate
 ]
-\definecolor{primary}  {HTML}{3CFFEE}
-\definecolor{secondary}{HTML}{24AABC}
-\definecolor{tertiary}{HTML}{356781}
-\definecolor{quartenary}{HTML}{2C3D51}
+\colorlet{primary}{blue!40!black}       % HTML {000066}
+\colorlet{secondary}{blue!20!white}     % HTML {CCCCFF}
+\colorlet{tertiary}{Green!40!Black}     % HTML {006600}
+\colorlet{quartenary}{Green!20!white}   % HTML {CCFFCC}
 \definecolor{quintenary}{HTML}{1C1F24}
 \tikzstyle{curve}=[primary,thick]
 \tikzstyle{curve label}=[black,opacity=1]
@@ -135,8 +135,7 @@
     }
 }
 \usepgfplotslibrary{polar}
-\pgfplotsset{
-slope field/.style={
+\pgfplotsset{slope field/.style={
     secondary,thin,
     /pgfplots/quiver={u=1,v={#1},scale arrows=0.1},
     /pgfplots/x filter/.expression={x-1*0.5*\pgfkeysvalueof{/pgfplots/quiver/scale arrows}},

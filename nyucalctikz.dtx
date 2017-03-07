@@ -51,7 +51,7 @@ and the derived files           tikzlibrarynyucalc.code.tex
 %<*library>
 % Keep version numbering separate from nyucalc.tex version numbering
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesFile{tikzlibrarynyucalc.code.tex}[2017/03/02 v0.0-dev TikZ and PGFPlots code for NYU calculus materials]
+\ProvidesFile{tikzlibrarynyucalc.code.tex}[2017/03/03 v0.0 TikZ and PGFPlots code for NYU calculus materials]
 %</library>
 %<*driver>
 \documentclass{amsdtx}
@@ -63,7 +63,26 @@ and the derived files           tikzlibrarynyucalc.code.tex
 \usepackage{tikz}
 \usetikzlibrary{nyucalc}
 \usetikzlibrary{fit}
-\usepackage{pgfcodex}
+\usepackage{ydoc-expl}
+\usepackage{tcolorbox}
+\usepackage{etoolbox}
+\lstset{backgroundcolor=\color{blue!10}}
+%: TODO Use a dogeared color box like tcolorbox's marker style <http://tex.stackexchange.com/a/307436/1402>
+%: TODO Use a rounded color box for the code listing
+\newcommand{\styleresultbox}[1]{%
+    \begin{tcolorbox}[%
+        colframe=LightGoldenrodYellow!50!black,
+        colback=LightGoldenrodYellow,
+        width=1cm+\wd\exampleresultbox,
+        halign=center,
+        sharpish corners]%
+    \mbox{#1}
+    \end{tcolorbox}
+}
+% There are two that need to be patched.
+\patchcmd{\PrintExample}{\fbox}{\styleresultbox}{}{}
+\patchcmd{\PrintExample}{\fbox}{\styleresultbox}{}{}
+
 \def\tikz/{\pkg{\protect{\normalfont Ti\textit{k}Z}}}
 \def\pgf/{\pkg{\protect{\normalfont\textsc{pgf}}}}
 \def\pgfplots/{\pkg{\protect{\normalfont\textsc{pgfplots}}}}
@@ -85,6 +104,11 @@ and the derived files           tikzlibrarynyucalc.code.tex
 % \date{Released \filedate\thanks{Version: \fileversion}}
 %
 % \maketitle
+%
+% \begin{tikzpicture}[remember picture,overlay]
+% \node[anchor=north west] at ([xshift=0.5in,yshift=-0.5in]current page.north west) 
+% {\includegraphics[width=2.5in]{NYUCourant}};
+% \end{tikzpicture}
 % 
 % \tableofcontents
 %
@@ -102,13 +126,25 @@ and the derived files           tikzlibrarynyucalc.code.tex
 % for the Digital Student}.
 % 
 % After several years the need arose to share with the rest of the NYU Mathematics
-% Clinical Faculty.  The \pkg{beamer} parts were excised out and the \tikz/ parts
-% remain.
+% Clinical Faculty.  The \pkg{beamer} parts were excised (perhaps to include in a 
+% future package) and the \tikz/ parts remain.
 %
 % This documentation file includes the implementation code and several examples
 % to aid in making nice diagrams and graphs.
 %
+% \subsection{Installation}
 %
+% Download the package and move \fn{tikzlibrarynyucalc.code.tex} somewhere your
+% \TeX{} binary can see it.  On my machine (MacOS), the local \TeX{} directory
+% is \fn{\~{}/Library/texmf}.  Within that directory, the canonical place to put 
+% this file is in the subdirectory \fn{tex/generic}.   
+%
+% Alternatively, you can check out the source code repository and \TeX{}
+% the file \fn{nyucalc.ins}.  Lastly, you can run  
+% \TeX{} (\emph{not} \LaTeX) on the \fn{nyucalctikz.dtx} file.  
+% With the proper \fn{docstrip.cfg} file in your \TeX{} input path,
+% the library will be delivered to the right subdirectory automatically.
+% 
 % We use \tikz/ and \pgfplots/, both built on the \pgf/ package.
 % This code goes into the file \fn{tikzlibrarynyucalc.code.tex}.
 % \setcounter{CodelineNo}{0}
@@ -121,7 +157,7 @@ and the derived files           tikzlibrarynyucalc.code.tex
 %    \begin{macrocode}
 \usepackage{tikz}
 %    \end{macrocode}
-% 
+%    \usetikzlibrary{nyucalc}
 % We want the colors defined with the \opt{svgnames} options of the \pkg{xcolor} package.
 % Since \tikz/ already loads \pkg{xcolor}, we have to go one step down and input the color definition file.
 %    \begin{macrocode}
@@ -188,8 +224,8 @@ and the derived files           tikzlibrarynyucalc.code.tex
 % 
 %
 % \subsection{Miscellaneous styles}
-% April 14, 2012: Nancy said the \tk{measurement} style is easier to see when it's black.
-% \begin{center}
+%
+% \begin{examplecode}
 %   \begin{tikzpicture}    
 %     \tikzstyle{board}=[draw=BurlyWood!50!black,fill=BurlyWood]
 %     % left stud
@@ -201,12 +237,13 @@ and the derived files           tikzlibrarynyucalc.code.tex
 %     % header
 %     \draw[board,rotate around={5:(0,2)}] (0,2) rectangle (2.3,2.3);
 %     \node[above,sloped,rotate around={5:(0,2)}] at (1,2.3) {header};
-%     \draw[measurement,arrows={-}] ([rotate around={5:(0,2)}]2.3,2) -- (0,2) -- (2.3,2)
+%     \draw[measurement,arrows={-}] 
+%          ([rotate around={5:(0,2)}]2.3,2) -- (0,2) -- (2.3,2)
 %       node[coordinate,
 %         pin={[inner sep=0pt,pin edge={measurement,arrows=<-}]-135:$\theta$}
 %       ] at ([rotate around={2.5:(0,2)}]1.75,2) {};
 %   \end{tikzpicture}    
-% \end{center}
+% \end{examplecode}
 
 %    \begin{macrocode}
 \tikzstyle{measurement}=[arrows={|<->|},Black]
@@ -225,7 +262,7 @@ and the derived files           tikzlibrarynyucalc.code.tex
 ]
 %    \end{macrocode}
 %
-%\begin{center}
+%\begin{examplecode}
 %    \pgfsetlayers{background,main,foreground}
 %    \begin{tikzpicture}%[baseline=(current bounding box.center)]
 %        \node[point,label=180:$1$] (P1) {};
@@ -243,7 +280,7 @@ and the derived files           tikzlibrarynyucalc.code.tex
 %            \node[set,fit=(P4) (P5) (P6)] {};
 %        \end{pgfonlayer}
 %    \end{tikzpicture}
-%\end{center}
+%\end{examplecode}
 %
 % \section{Color Schemes}
 %
@@ -251,21 +288,21 @@ and the derived files           tikzlibrarynyucalc.code.tex
 %
 % This color scheme is ``\href{http://kuler.adobe.com/#themeID/123}{Raygun Gothic}'', which I made on Adobe's Kuler application.
 %    \begin{macrocode}
-\definecolor{primary}  {HTML}{3CFFEE}
-\definecolor{secondary}{HTML}{24AABC}
-\definecolor{tertiary}{HTML}{356781}
-\definecolor{quartenary}{HTML}{2C3D51}
-\definecolor{quintenary}{HTML}{1C1F24}
+%\definecolor{primary}  {HTML}{3CFFEE}
+%\definecolor{secondary}{HTML}{24AABC}
+%\definecolor{tertiary}{HTML}{356781}
+%\definecolor{quartenary}{HTML}{2C3D51}
+%\definecolor{quintenary}{HTML}{1C1F24}
 %    \end{macrocode}
 %
 % Here is a blue/green motif:
 %    \begin{macrocode}
 %:TODO make this a key
-%\colorlet{primary}{blue!40!black}       % HTML {000066}
-%\colorlet{secondary}{blue!20!white}     % HTML {CCCCFF}
-%\colorlet{tertiary}{Green!40!Black}     % HTML {006600}
-%\colorlet{quartenary}{Green!20!white}   % HTML {CCFFCC}
-%\definecolor{quintenary}{HTML}{1C1F24}
+\colorlet{primary}{blue!40!black}       % HTML {000066}
+\colorlet{secondary}{blue!20!white}     % HTML {CCCCFF}
+\colorlet{tertiary}{Green!40!Black}     % HTML {006600}
+\colorlet{quartenary}{Green!20!white}   % HTML {CCFFCC}
+\definecolor{quintenary}{HTML}{1C1F24}
 \tikzstyle{curve}=[primary,thick]
 \tikzstyle{curve label}=[black,opacity=1]
 \tikzstyle{curve direction}=[curve,fill opacity=1]
@@ -342,16 +379,18 @@ and the derived files           tikzlibrarynyucalc.code.tex
     }
 }
 %    \end{macrocode}
-% \begin{codeexample}[leave comments]
-% \begin{tikzpicture}
-%    \begin{axis}[
-%       number line,
-%       xmin=0,xmax=3,
-%   ]
-%    \end{axis}
-% \end{tikzpicture}
-% \end{codeexample}
-% \changes{v0.3.1}{2015/07/16}{Added a \tk{y number line} key}
+% \begin{example}
+%    \begin{examplecode}
+%       \begin{tikzpicture}
+%           \begin{axis}[
+%               number line,
+%               xmin=0,xmax=3,
+%           ]
+%           \end{axis}
+%       \end{tikzpicture}
+%    \end{examplecode}
+% \caption{number line}
+% \end{example}
 %    \begin{macrocode}
 \pgfplotsset{%
     number line y/.style={%
@@ -369,26 +408,32 @@ and the derived files           tikzlibrarynyucalc.code.tex
     }
 }
 %    \end{macrocode}
-% \begin{codeexample}[leave comments]
-% \begin{tikzpicture}
-%    \begin{axis}[
-%       number line y,
-%       ymin=0,ymax=3,
-%   ]
-%    \end{axis}
-% \end{tikzpicture}
-% \end{codeexample}
+% \begin{example}
+%    \begin{examplecode}
+%        \begin{tikzpicture}
+%        \begin{axis}[
+%           number line y,
+%           ymin=0,ymax=3,
+%        ]
+%        \end{axis}
+%        \end{tikzpicture}
+%    \end{examplecode}
+% \caption{upward extending number line}
+% \end{example}
 % Use \tk{y number line} with \verb|scale=-1| if you want the number line to increase downwards.
-% \begin{codeexample}[leave comments]
-% \begin{tikzpicture}
-%    \begin{axis}[
-%       number line y,
-%       ymin=0,ymax=3,
-%       yscale=-1
-%   ]
-%    \end{axis}
-% \end{tikzpicture}
-% \end{codeexample}%
+% \begin{example}
+%     \begin{examplecode}
+%        \begin{tikzpicture}
+%        \begin{axis}[
+%           number line y,
+%           ymin=0,ymax=3,
+%           yscale=-1
+%        ]
+%        \end{axis}
+%        \end{tikzpicture}
+%     \end{examplecode}
+% \caption{downward extending number line}
+% \end{example}
 % \tk{interval labels} are for increasing/decreasing, concave up/down, etc.
 %    \begin{macrocode}
 \pgfplotsset{%
@@ -434,32 +479,32 @@ and the derived files           tikzlibrarynyucalc.code.tex
 %
 % \subsection{Polar plots}
 %
-% \begin{codeexample}[leave comments]
-%    \begin{tikzpicture}
-%    \tikzstyle{every plot}=[] % usually smooth, but that gets in the way of only marks below
+%
+% \begin{examplecode}
+%    \begin{tikzpicture}[
+%        declare function={f(\t) = 1+sin(\t);}
+%    ]
 %        \begin{polaraxis}[
 %            axis x line=right,
 %            xtick={0,30,45,60,90,120,135,150,180,210,225,240,270,300,315,330},
 %            xticklabels={
-%                0,$\frac{\pi}{6}$,$\frac{\pi}{4}$,$\frac{\pi}{3}$,$\frac{\pi}{2}$,$\frac{2\pi}{3}$,$\frac{3\pi}{4}$,$\frac{5\pi}{6}$,
-%                $\pi$,$\frac{7\pi}{6}$,$\frac{5\pi}{4}$,$\frac{4\pi}{3}$,$\frac{3\pi}{2}$,$\frac{5\pi}{3}$,$\frac{7\pi}{4}$,$\frac{11\pi}{6}$
+%                0,$\frac{\pi}{6}$,$\frac{\pi}{4}$,$\frac{\pi}{3}$,$\frac{\pi}{2}$,
+%                $\frac{2\pi}{3}$,$\frac{3\pi}{4}$,$\frac{5\pi}{6}$,$\pi$,
+%                $\frac{7\pi}{6}$,$\frac{5\pi}{4}$,$\frac{4\pi}{3}$,$\frac{3\pi}{2}$,
+%                $\frac{5\pi}{3}$,$\frac{7\pi}{4}$,$\frac{11\pi}{6}$
 %            },
 %            ymin=0,ymax=2,
+%            variable=theta,
 %        ]
-%            \addplot+[mark=none,data cs=polarrad,domain=0:6.28,forget plot,samples=100] {2*sin(deg(x))};
-%            \addplot+[only marks,data cs=polarrad,mark=*] coordinates{
-%                (0.5236,1.)
-%                (0.7854,1.4142)
-%                (1.0472,1.7321)
-%                (1.5708,2.)
-%                (2.0944,1.7321)
-%                (2.3562,1.4142)
-%                (2.618,1.)
-%                (3.1416,0.)
-%            };
+%            \addplot+[data cs=polar,mark=none,domain=0:360,
+%                samples=100,forget plot] {f(theta)};
+%             \addplot+[data cs=polar,only marks,mark=*,
+%                 samples at={30,45,60,90,120,135,150,180,
+%                     210,225,240,270,300,315,330}
+%             ] {f(theta)};
 %        \end{polaraxis}
 %    \end{tikzpicture}
-% \end{codeexample}
+% \end{examplecode}
 %    \begin{macrocode}
 \usepgfplotslibrary{polar}
 %    \end{macrocode}
@@ -470,7 +515,8 @@ and the derived files           tikzlibrarynyucalc.code.tex
 % But since no arrow style is set the arrows are headless.
 % We use a coordinate filter to shift the line segments so that the base point 
 % is at the \emph{center} of the segment instead of the tail.
-% \begin{codeexample}[leave comments]
+%
+% \begin{examplecode}
 %    \begin{tikzpicture}[
 %        declare function={
 %            F(\y,\t) = \t+\y;
@@ -494,11 +540,10 @@ and the derived files           tikzlibrarynyucalc.code.tex
 %            \addplot+[ode solution,variable=\t,domain=-3:3] {phi(t,0)};
 %        \end{axis}
 %    \end{tikzpicture}
-% \end{codeexample}
+% \end{examplecode}
 %
 %    \begin{macrocode}
-\pgfplotsset{
-slope field/.style={
+\pgfplotsset{slope field/.style={
     secondary,thin,
     /pgfplots/quiver={u=1,v={#1},scale arrows=0.1},
     /pgfplots/x filter/.expression={x-1*0.5*\pgfkeysvalueof{/pgfplots/quiver/scale arrows}},
@@ -512,19 +557,18 @@ slope field/.style={
 %
 % \begin{TikZkey}{vector}
 %     The \tk{vector} key is for vectors.
-% \changes{v0.4}{2015/08/27}{added a \tk{vector} key}
-% \begin{codeexample}[leave comments]
+%
+% \begin{examplecode}
 %    \begin{tikzpicture}
 %        \draw[vector] (0,0) --++ (3,2) node[vector label,below] {$\mathbf{u}$};
 %    \end{tikzpicture}
-% \end{codeexample}
+% \end{examplecode}
 %    \begin{macrocode}
 \tikzset{>=stealth}
 \tikzstyle{vector}=[primary,very thick,arrows={->}]
 %    \end{macrocode}
 % \end{TikZkey}
 % \begin{TikZkey}{vector label}
-% \changes{v0.5}{2015/09/18}{Added}
 %    \begin{macrocode}
 \tikzstyle{vector label}=[pos=0.5,black]
 %    \end{macrocode}
